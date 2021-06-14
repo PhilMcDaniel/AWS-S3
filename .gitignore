@@ -114,7 +114,7 @@ dmypy.json
 .pyre/
 
 #extra
-config.py
+configs.py
 venv/
 env/
 .vscode/
