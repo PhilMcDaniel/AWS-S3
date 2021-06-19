@@ -16,10 +16,13 @@ import threading
 
 import boto3
 from boto3.s3.transfer import TransferConfig
+import configs
+from botocore.exceptions import NoCredentialsError
 
 
 MB = 1024 * 1024
-s3 = boto3.resource('s3')
+s3 = boto3.client('s3', aws_access_key_id=configs.AccessKeyId,
+                      aws_secret_access_key=configs.SecretKey)
 
 
 class TransferCallback:
@@ -215,3 +218,18 @@ def download_with_sse(bucket_name, object_key, download_file_path,
         ExtraArgs=extra_args,
         Callback=transfer_callback)
     return transfer_callback.thread_info
+
+def upload_to_aws(local_file, bucket, s3_file):
+    s3 = boto3.client('s3', aws_access_key_id=configs.AccessKeyId,
+                      aws_secret_access_key=configs.SecretKey)
+
+    try:
+        s3.upload_file(local_file, bucket, s3_file)
+        print("Upload Successful")
+        return True
+    except FileNotFoundError:
+        print("The file was not found")
+        return False
+    except NoCredentialsError:
+        print("Credentials not available")
+        return False
