@@ -18,7 +18,7 @@ import boto3
 from boto3.s3.transfer import TransferConfig
 import configs
 from botocore.exceptions import NoCredentialsError
-
+import os
 
 MB = 1024 * 1024
 s3 = boto3.client('s3', aws_access_key_id=configs.AccessKeyId,
@@ -233,3 +233,19 @@ def upload_to_aws(local_file, bucket, s3_file):
     except NoCredentialsError:
         print("Credentials not available")
         return False
+
+def getListOfFiles(dirName):
+    # create a list of file and sub directories 
+    # names in the given directory 
+    listOfFile = os.listdir(dirName)
+    allFiles = list()
+    # Iterate over all the entries
+    for entry in listOfFile:
+        # Create full path
+        fullPath = os.path.join(dirName, entry)
+        # If entry is a directory then get the list of files in this directory 
+        if os.path.isdir(fullPath):
+            allFiles = allFiles + getListOfFiles(fullPath)
+        else:
+            allFiles.append(fullPath)
+    return allFiles
